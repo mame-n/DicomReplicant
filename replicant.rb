@@ -36,6 +36,7 @@ class Replicant
 
         if header[0] == 0x0010 && header[1] == 0x0010 # Patient name
           allget -= 1
+          puts "Patient name"
           fp_out.write( header[0].pack("S") )
           fp_out.write( header[1].pack("S") )
           body_size_out( body_size+3 , fp_out )
@@ -43,11 +44,13 @@ class Replicant
           pname = body.unpack("A*")[0] + "001"
           fp_out.write( [pname].pack("A*") )
 
-        elsif header[0] == 0x0010 && header[1] == 0x0020  # Patirnt ID
+        elsif header[0] == 0x0010 && header[1] == 0x0020  # Patient ID
           allget -= 1
+          puts "Patient ID"
           
         elsif header[0] == 0x0020 && header[1] == 0x000D  # Study instance UID
           allget -= 1
+          puts "Study instance UID"
           
         else
           fp_out.write( header )
