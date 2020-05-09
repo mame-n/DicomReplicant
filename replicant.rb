@@ -70,20 +70,21 @@ class Replicant
 
   def anal_one_chank( fp, data )
     header = data.unpack("S2A2")
+    saved_data = header
     ret_header = {:tag0 => header[0], :tag1 => header[1], :vr => header[2]}
 
     if ["OB","OF","OW","UN","UT"].include?( header[2] )
-      saved_data = fp.read(2)
+      saved_data += fp.read(2)
       data = fp.read(4)
       saved_data += data
       ret_header[:size] = data.unpack("L")[0]
       
     elsif ["AE","AS","AT","CS","DA","DS","DT","FL","FD","IS","LO","LT","OD","OL","OV","PN","SH","SL","SS","ST","SV","TM","UC","UI","UL","UR","US","UV"].include?( header[2] )
-      saved_data = fp.read(2)
+      saved_data += fp.read(2)
       ret_header[:size] = saved_data.unpack("S")[0]
       
     elsif ["SQ"].include?( header[2] )
-      saved_data = fp.read(2)
+      saved_data += fp.read(2)
       size = fp.read(4)
       saved_data += size
       if size.unpack("S2") != [0xFFFF,0xFFFF]
@@ -94,6 +95,7 @@ class Replicant
     else
       -1
     end
+    ret_header, saved_data
   end
 
   def dum_read_SQ( fp )
