@@ -47,29 +47,22 @@ class Replicant
   end
 
   def main
-    human = 
+    return false if confirm_dcm
+
+    @human_dcm["0010,0010"].value = "DICOMKENSYO_Name" # Patient Name
+    
     1.upto( @num_replicants ) do |num|
-      new_dcm_path = copy_dcm(num)
-      dcm = DICOM::DObject.read( new_dcm_path )
-      dcm["0010,0010"].value = "DICOMKENSYO_Name" # Patient Name
-      dcm["0010,0020"].value = "DICOMKENSYO_"+sprintf("%03d", num) # Patient ID
+      @human_dcm["0010,0020"].value = "DICOMKENSYO_"+sprintf("%03d", num) # Patient ID
+      @human_dcm.write( replicant_name( num ) )
     end
+
   end
 
-  def copy_dcm(i)
+  def replicant_name(i)
     if (extname = File.extname(@dcm_fname)) == ""
-      new_dcm_path = @dcm_fname + sprintf( "_%03d", i )
+      @dcm_fname + sprintf( "_%03d", i )
     else
-      new_dcm_path = File.basename( @dcm_fname, extname ) + sprintf( "_%03d", i ) + extname
-    end
-    FileUtils.cp @dcm_fname, new_dcm_path
-    new_dcm_path
-  end
-
-  def confirm
-    Dir.glob( "./US000001_*" ).map do |fpath|
-      dcm = DICOM::DObject.read(fpath)
-      puts "name,ID : #{dcm.value("0010,0010")}, #{dcm.value("0010,0020")}"
+      File.basename( @dcm_fname, extname ) + sprintf( "_%03d", i ) + extname
     end
   end
 
