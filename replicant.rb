@@ -1,4 +1,4 @@
-require 'fileutils'
+#require 'fileutils'
 require 'dicom'
 
 class Replicant
@@ -47,8 +47,10 @@ class Replicant
   end
 
   def main
-    return false if confirm_dcm
+    puts "Check dcm"
+    return false unless confirm_dcm
 
+    puts "Sucsess to confirm dcm"
     @human_dcm["0010,0010"].value = "DICOMKENSYO_Name" # Patient Name
     
     1.upto( @num_replicants ) do |num|
@@ -56,13 +58,15 @@ class Replicant
       @human_dcm.write( replicant_name( num ) )
     end
 
+    replicant_confirmation
   end
 
   def replicant_name(i)
     if (extname = File.extname(@dcm_fname)) == ""
-      @dcm_fname + sprintf( "_%03d", i )
+      sprintf( "%s_%03d", @dcm_fname, i )
     else
-      File.basename( @dcm_fname, extname ) + sprintf( "_%03d", i ) + extname
+      # sprintf( "%s_%03d%s", File.basename( @dcm_fname, extname ), i, extname )
+      @dcm_fname.gsub( /#{extname}$/ , sprintf( "_%03d%s", i, extname) )
     end
   end
 
@@ -71,6 +75,19 @@ class Replicant
     puts "useg: relicant <original file path> <number of duplicating files>"
   end
 
+  def replicant_confirmation
+    puts "Expected differenciation is false : [File Meta Information Group Length] and [Source Application Entity Title]"
+
+    dcm_original = DICOM::DObject.read( @dcm_fname )
+    dcm_original_hash = dcm_original.to_hash
+    1.upto( @num_replicants ) do |num|
+      dcm_replicant = DICOM::DObject.read( replicant_name( num ) )
+      dcm_replicant_hash = dcm_replicant.to_hash
+      dcm_replicant_hash.each do |key, value|
+        puts "False #{num}: [#{key} , #{value}] <== #{dcm_original_hash[key]}" unless value == dcm_original_hash[key]
+      end
+    end
+  end
 end
 
 if $0 == __FILE__
