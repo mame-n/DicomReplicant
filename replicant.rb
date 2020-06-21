@@ -70,6 +70,13 @@ class Replicant
     end
   end
 
+  def replicant_instanceUID( uid, n )
+    if uid.size > 57
+      uid[57,uid.size-57] = ''  # Max 62 chars.
+    end
+    uid + ".%04d" % n
+  end
+
   def puts_usage
     puts "No input file path is specified."
     puts "useg: relicant <original file path> <number of duplicating files>"

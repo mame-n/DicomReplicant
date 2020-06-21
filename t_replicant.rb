@@ -18,6 +18,13 @@ class TC < Test::Unit::TestCase
     assert_equal( num_reps, obr.num_replicants )
   end
 
+  def test_replicant_instanceUID
+    obr = Replicant.new(["DicomFiles/A0000"])
+    assert_equal( "123.0000", obr.replicant_instanceUID( "123", 0 ))
+    assert_equal( "123.0001", obr.replicant_instanceUID( "123", 1 ))
+    assert_equal( "123.1234", obr.replicant_instanceUID( "123", 1234 ))
+  end
+
   def test_confirm_dcm
     num_reps = 2.to_s
 
