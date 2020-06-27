@@ -47,14 +47,15 @@ class Replicant
   end
 
   def main
-    puts "Check dcm"
+#    puts "Check dcm"
     return false unless confirm_dcm
 
-    puts "Sucsess to confirm dcm"
+#    puts "Sucsess to confirm dcm"
     @human_dcm["0010,0010"].value = "DICOMKENSYO_Name" # Patient Name
     
     1.upto( @num_replicants ) do |num|
       @human_dcm["0010,0020"].value = "DICOMKENSYO_"+sprintf("%03d", num) # Patient ID
+      @human_dcm["0008,0018"].value = replicant_instanceUID( @human_dcm["0008,0018"].value, num ) # Study instance UID
       @human_dcm.write( replicant_name( num ) )
     end
 
@@ -79,11 +80,12 @@ class Replicant
 
   def puts_usage
     puts "No input file path is specified."
-    puts "useg: relicant <original file path> <number of duplicating files>"
+    puts "Replicant is not human. It is a copying DICOM file with some modification."
+    puts "useg: replicant <original file path> <number of duplicating files>"
   end
 
   def replicant_confirmation
-    puts "Expected differenciation is false : [File Meta Information Group Length] and [Source Application Entity Title]"
+#    puts "Expected differenciation is false : [File Meta Information Group Length] and [Source Application Entity Title]"
 
     dcm_original = DICOM::DObject.read( @dcm_fname )
     dcm_original_hash = dcm_original.to_hash
@@ -91,7 +93,7 @@ class Replicant
       dcm_replicant = DICOM::DObject.read( replicant_name( num ) )
       dcm_replicant_hash = dcm_replicant.to_hash
       dcm_replicant_hash.each do |key, value|
-        puts "False #{num}: [#{key} , #{value}] <== #{dcm_original_hash[key]}" unless value == dcm_original_hash[key]
+#        puts "False #{num}: [#{key} , #{value}] <== #{dcm_original_hash[key]}" unless value == dcm_original_hash[key]
       end
     end
   end

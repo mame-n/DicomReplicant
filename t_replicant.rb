@@ -90,7 +90,7 @@ class TC < Test::Unit::TestCase
     assert_equal( "DicomFiles/A00.dcm00_010.dcm", obr.replicant_name( 10 ) )
     assert_equal( "DicomFiles/A00.dcm00_123.dcm", obr.replicant_name( 123 ) )
     assert_equal( "DicomFiles/A00.dcm00_99999.dcm", obr.replicant_name( 99999 ) )
-end
+  end
     
   def test_main
     dcm_org_path = "DicomFiles/A0000"
@@ -102,6 +102,7 @@ end
       dcm = DICOM::DObject.read( obr.replicant_name( num ) )
       assert_equal( "DICOMKENSYO_Name", dcm["0010,0010"].value )
       assert_equal( sprintf( "DICOMKENSYO_%03d", num ), dcm["0010,0020"].value )
+      assert_equal( "1.2.392.200036.9116.6.26.10500001.4673.20171208053528075..%04d" % num, dcm["0008,0018"].value )
       File.delete( obr.replicant_name( num ) )
     end
   end
